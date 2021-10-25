@@ -1,8 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
 require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const auth = require('./middlewares/auth');
@@ -16,6 +18,8 @@ const { DATABASE_DEV, mongooseSettings } = require('./middlewares/constants');
 const { DATABASE, NODE_ENV } = process.env;
 const { PORT = 3000 } = process.env;
 const app = express();
+
+app.use(helmet());
 app.use(cookieParser());
 
 app.get('/posts', (req, res) => {
