@@ -9,13 +9,14 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const auth = require('./middlewares/auth');
-const { login, createUser } = require('./controllers/users');
+// const { login, createUser } = require('./controllers/users');
 const NotFound = require('./errors/NotFound');
-const { validateSigIn, validateSigUp } = require('./middlewares/Validation');
+// const { validateSigIn, validateSigUp } = require('./middlewares/Validation');
 const { handleErrors } = require('./errors/HandleErrors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { DATABASE_DEV, mongooseSettings } = require('./utils/constants');
 const limiterSettings = require('./utils/limiterSettings');
+const routes = require('./routes/index');
 
 const limiter = rateLimit(limiterSettings);
 const { DATABASE, NODE_ENV } = process.env;
@@ -31,6 +32,8 @@ app.get('/posts', (req, res) => {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(routes);
 
 // mongoose.connect('mongodb://localhost:27017/moviesdb', {
 //   useNewUrlParser: true,
@@ -50,11 +53,11 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signup', validateSigUp, createUser);
-app.post('/signin', validateSigIn, login);
-
-app.use('/users', auth, require('./routes/users'));
-app.use('/movies', auth, require('./routes/movies'));
+// app.post('/signup', validateSigUp, createUser);
+// app.post('/signin', validateSigIn, login);
+//
+// app.use('/users', auth, require('./routes/users'));
+// app.use('/movies', auth, require('./routes/movies'));
 
 app.use(auth, (req, res, next) => {
   next(new NotFound(`По адресу ${req.path} ничего нет`));
