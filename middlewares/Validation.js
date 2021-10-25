@@ -2,11 +2,11 @@ const { celebrate, Joi } = require('celebrate');
 // const errorMessages = require('../errors/ErrorMessages');
 
 const {
-  wrongName, wrongAuth, wrongId, wrongMail, wrongPassword,
+  wrongName, wrongAuth, wrongId, wrongMail, wrongPassword, wrongLink,
 } = require('../errors/ErrorMessages');
 
 // eslint-disable-next-line max-len
-// const link = /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/i;
+const link = /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/i;
 
 const validateUser = celebrate({
   body: Joi.object().keys({
@@ -39,12 +39,15 @@ const validateMovie = celebrate({
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().required(),
-    trailer: Joi.string().required(),
+    image: Joi.string().pattern(link).required()
+      .error(new Joi.ValidationError(wrongLink)),
+    trailer: Joi.string().pattern(link).required()
+      .error(new Joi.ValidationError(wrongLink)),
     movieId: Joi.number().unsafe().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
-    thumbnail: Joi.string().required(),
+    thumbnail: Joi.string().pattern(link).required()
+      .error(new Joi.ValidationError(wrongLink)),
   }).unknown(true),
 });
 
