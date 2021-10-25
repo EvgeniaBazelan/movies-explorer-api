@@ -15,6 +15,7 @@ const errorMessage = {
   internalServerError: 'На сервере произошла ошибка',
   invalidUrl: 'Неправильный формат ссылки',
   invalidEmail: 'Неправильный формат электронной почты',
+  tooManyRequests: 'Слишком много запросов с этого IP. Попробуйте через 1 час',
 };
 module.exports = {
   errorMessage,

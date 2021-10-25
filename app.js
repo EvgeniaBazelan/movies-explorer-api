@@ -7,14 +7,17 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const rateLimit = require('express-rate-limit');
 const auth = require('./middlewares/auth');
 const { login, createUser } = require('./controllers/users');
 const NotFound = require('./errors/NotFound');
 const { validateSigIn, validateSigUp } = require('./middlewares/Validation');
 const { handleErrors } = require('./errors/HandleErrors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { DATABASE_DEV, mongooseSettings } = require('./middlewares/constants');
+const { DATABASE_DEV, mongooseSettings } = require('./utils/constants');
+const limiterSettings = require('./utils/limiterSettings');
 
+const limiter = rateLimit(limiterSettings);
 const { DATABASE, NODE_ENV } = process.env;
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -39,6 +42,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.connect(NODE_ENV === 'production' ? DATABASE : DATABASE_DEV, mongooseSettings);
 
 app.use(requestLogger);
+app.use(limiter);
 // app.use(errors);
 app.get('/crash-test', () => {
   setTimeout(() => {
