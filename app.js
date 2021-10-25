@@ -9,9 +9,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const auth = require('./middlewares/auth');
-// const { login, createUser } = require('./controllers/users');
 const NotFound = require('./errors/NotFound');
-// const { validateSigIn, validateSigUp } = require('./middlewares/Validation');
 const { handleErrors } = require('./errors/HandleErrors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { DATABASE_DEV, mongooseSettings } = require('./utils/constants');
@@ -35,13 +33,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(routes);
 
-// mongoose.connect('mongodb://localhost:27017/moviesdb', {
-//   useNewUrlParser: true,
-//   useCreateIndex: true,
-//   useFindAndModify: false,
-//   useUnifiedTopology: true,
-// });
-// mongoose.connect(DATABASE_DEV, mongooseSettings);
 mongoose.connect(NODE_ENV === 'production' ? DATABASE : DATABASE_DEV, mongooseSettings);
 
 app.use(requestLogger);
