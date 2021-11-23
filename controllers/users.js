@@ -83,7 +83,7 @@ module.exports.login = (req, res, next) => {
       res
         .cookie('jwt', token, {
           maxAge: 604800000,
-          domain: 'movies.backend.nomoredomains.rocks/api',
+          domain: 'movies.backend.nomoredomains.rocks',
           httpOnly: true,
         })
         .send({ message: 'Авторизация прошла успешно', token: token });
