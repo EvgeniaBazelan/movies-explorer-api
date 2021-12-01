@@ -26,28 +26,21 @@ module.exports.createUser = (req, res, next) => {
       if (user) {
         return next(new ConflictingRequest('Пользователь уже существует'));
       }
-      return bcrypt.hash(password, 10)
-
-        .then((hash) => User.create({
-
-          name, email, password: hash,
-
-        })
-          // eslint-disable-next-line no-shadow
-          .then((user) => {
-            res.status(201).send(user.toJSON());
-          }))
-
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            throw new BadRequest('Ошибка при создании пользователя');
-          } else if (err.name === 'MongoError' && err.code === 11000) {
-            throw new ConflictingRequest('Пользователь с таким E-mail уже существует');
-          }
-        });
+      return bcrypt.hash(password, 10);
     })
-
-    .catch(next);
+    .then((hash) => User.create({
+      name, email, password: hash,
+    }))
+  // eslint-disable-next-line no-shadow
+    .then((user) => res.status(201).send(user.toJSON()))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new BadRequest('Ошибка при создании пользователя'));
+      } if (err.name === 'MongoError' && err.code === 11000) {
+        return next(new ConflictingRequest('Пользователь с таким E-mail уже существует'));
+      }
+      return next(err);
+    });
 };
 module.exports.updateUser = (req, res, next) => {
   const id = req.user._id;
@@ -64,10 +57,10 @@ module.exports.updateUser = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequest('Данные пользователя не корректны');
+        return next(new BadRequest('Данные пользователя не корректны'));
       }
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {
@@ -82,7 +75,7 @@ module.exports.login = (req, res, next) => {
         // 'secretKey123',
         { expiresIn: 604800000 },
       );
-      res.send({ message: 'Авторизация прошла успешно', token: token });
+      return res.send({ message: 'Авторизация прошла успешно', token: token });
       // res
       // .cookie('jwt', token, {
       //   maxAge: 604800000,
@@ -91,7 +84,7 @@ module.exports.login = (req, res, next) => {
       //   secure: true,
       //   sameSite: true,
       // })
-      //.send({ message: 'Авторизация прошла успешно', token: token });
+      // .send({ message: 'Авторизация прошла успешно', token: token });
     })
     .catch((err) => next(new Unauthorized(`Пользователь не авторизован + ${err.message}`)));
 };
@@ -102,8 +95,8 @@ module.exports.getUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        throw new NotFound('Пользователь по указанному _id не найден!');
+        return next(new NotFound('Пользователь по указанному _id не найден!'));
       }
-    })
-    .catch(next);
+      return next(err);
+    });
 };

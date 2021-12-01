@@ -25,10 +25,10 @@ const createMovie = (req, res, next) => {
     .then((movie) => res.status(200).send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Вы не заполнили обязательные поля или данные не верны');
+        return next(new BadRequest('Вы не заполнили обязательные поля или данные не верны'));
       }
-    })
-    .catch(next);
+      return next(err);
+    });
 };
 
 const deleteMovieById = (req, res, next) => {
@@ -37,13 +37,11 @@ const deleteMovieById = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .then((movie) => {
       if (movie.owner.toString() === req.user._id) {
-        Movie.findByIdAndRemove(req.params.id)
-          // eslint-disable-next-line no-shadow
-          .then((movie) => res.send(movie));
-      } else {
-        return next(new Forbidden('Недостаточно прав для удаления карточки'));
+        return Movie.findByIdAndRemove(req.params.id);
       }
+      throw new Forbidden('Недостаточно прав для удаления карточки');
     })
+    .then((movie) => res.send(movie))
     .catch(next);
 };
 
