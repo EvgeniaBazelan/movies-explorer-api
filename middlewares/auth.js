@@ -8,18 +8,46 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 
 const Unauthorized = require('../errors/Unauthorized');
 
-module.exports = (req, res, next) => {
-  const token = req.cookies.jwt;
-  if (!token) {
-    return next(new Unauthorized('Необходима авторизация'));
-  }
-  // eslint-disable-next-line no-return-assign,no-undef
+// middlewares/auth.js
 
-  return payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', (err, decoded) => {
-    if (err) {
-      return next(new Unauthorized('Необходима авторизация'));
-    }
-    req.user = decoded;
-    return next();
-  });
+// eslint-disable-next-line consistent-return
+module.exports = (req, res, next) => {
+  const { authorization } = req.headers;
+
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return res
+      .status(401)
+      .send({ message: 'Необходима авторизация' });
+  }
+
+  const token = authorization.replace('Bearer ', '');
+  let payload;
+
+  try {
+    payload = jwt.verify(token, 'some-secret-key');
+  } catch (err) {
+    return res
+      .status(401)
+      .send({ message: 'Необходима авторизация' });
+  }
+
+  req.user = payload; // записываем пейлоуд в объект запроса
+
+  next(); // пропускаем запрос дальше
 };
+
+// module.exports = (req, res, next) => {
+//   const token = req.cookies.jwt;
+//   if (!token) {
+//     return next(new Unauthorized('Необходима авторизация'));
+//   }
+//   // eslint-disable-next-line no-return-assign,no-undef
+//
+//   return payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', (err, decoded) => {
+//     if (err) {
+//       return next(new Unauthorized('Необходима авторизация'));
+//     }
+//     req.user = decoded;
+//     return next();
+//   });
+// };

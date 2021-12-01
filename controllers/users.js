@@ -82,13 +82,16 @@ module.exports.login = (req, res, next) => {
         // 'secretKey123',
         { expiresIn: 604800000 },
       );
-      res
-        .cookie('jwt', token, {
-          maxAge: 604800000,
-          domain: 'movies.backend.nomoredomains.rocks',
-          httpOnly: true,
-        })
-        .send({ message: 'Авторизация прошла успешно', token: token });
+      res.send({ message: 'Авторизация прошла успешно', token: token });
+      // res
+      // .cookie('jwt', token, {
+      //   maxAge: 604800000,
+      //   domain: 'movies.backend.nomoredomains.rocks',
+      //   httpOnly: true,
+      //   secure: true,
+      //   sameSite: true,
+      // })
+      //.send({ message: 'Авторизация прошла успешно', token: token });
     })
     .catch((err) => next(new Unauthorized(`Пользователь не авторизован + ${err.message}`)));
 };
