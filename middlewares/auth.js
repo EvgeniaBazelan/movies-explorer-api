@@ -17,7 +17,7 @@ module.exports = (req, res, next) => {
   if (!authorizationHeader || !authorizationHeader.trim().startsWith('Bearer ')) {
     return res
       .status(401)
-      .send({ message: 'Необходима авторизация' });
+      .send({ message: 'Необходима авторизация1' });
   }
 
   const token = authorizationHeader.replace('Bearer ', '').trim();
@@ -28,7 +28,7 @@ module.exports = (req, res, next) => {
   } catch (err) {
     return res
       .status(401)
-      .send({ message: 'Необходима авторизация' });
+      .send({ message: 'Необходима авторизация2' });
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
