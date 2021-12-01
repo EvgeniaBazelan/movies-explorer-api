@@ -12,19 +12,19 @@ const Unauthorized = require('../errors/Unauthorized');
 
 // eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
-  const { authorization } = req.headers;
+  const authorizationHeader = req.headers.authorization;
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  if (!authorizationHeader || !authorizationHeader.trim().startsWith('Bearer ')) {
     return res
       .status(401)
       .send({ message: 'Необходима авторизация' });
   }
 
-  const token = authorization.replace('Bearer ', '');
+  const token = authorizationHeader.replace('Bearer ', '').trim();
   let payload;
 
   try {
-    payload = jwt.verify(token, 'some-secret-key');
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     return res
       .status(401)
